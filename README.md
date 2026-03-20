@@ -2,7 +2,9 @@
 
 个人自动化 AI 学术追踪与简报系统 —— 你的私人"学术秘书"。
 
-自动从 arXiv 检索最新论文 → AI 客观提取信息 → 生成 HTML 简报 → 根据阅读行为持续进化关键词。
+这是一个vibe coding项目，是本人第一个vibe coding项目，使用的是Claude 3.6 sonnet。prompt记录与prompt.txt文件中
+
+作用：自动从 arXiv 检索最新论文 → AI 客观提取信息 → 生成 HTML 简报 → 根据阅读行为持续进化关键词。
 
 ---
 
@@ -104,7 +106,8 @@ auto-paper-briefing/
 ├── history.json               # 自动生成：已处理论文记录
 ├── clicks.json                # 自动生成：点击行为记录
 ├── likes.json                 # 自动生成：点赞记录
-└── seeds.json                 # 自动生成：手动添加的种子文章
+├── seeds.json                 # 自动生成：手动添加的种子文章
+└── prompt.md                  # vibe coding prompt
 ```
 
 ---

@@ -81,7 +81,7 @@ class ReportGenerator:
 <div class="container">
   {cards}
   <div class="footer">
-    Auto-Paper-Briefing · {date_display} · 客观信息提取，不含主观评价
+    Auto-Paper-Briefing · {date_display} · 客观信息提取，不含主观评价 · zjz
   </div>
 </div>
 
