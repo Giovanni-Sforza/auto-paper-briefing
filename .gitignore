@@ -1,0 +1,10 @@
+*.bak
+reports
+temp_pdfs
+history.json
+clicks.json
+likes.json
+seeds.json
+.DS*
+*.pyc
+modules/__pycache__
