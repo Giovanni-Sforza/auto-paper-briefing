@@ -55,6 +55,12 @@ arxiv:
 # macOS / Linux
 export AI_API_KEY="sk-xxxxxxxxxxxxxxxx"
 
+#永久生效
+echo 'export AI_API_KEY="sk-xxxxxxxxxxxxxxxx"' >> ~/.zshrc
+source ~/.zshrc
+#验证是否生效
+echo $AI_API_KEY
+
 # Windows PowerShell
 $env:AI_API_KEY = "sk-xxxxxxxxxxxxxxxx"
 ```
