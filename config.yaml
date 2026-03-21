@@ -14,16 +14,14 @@ ai:
 arxiv:
   # 检索关键词列表（支持精确匹配和逻辑运算）
   queries:
-    - "ultraperipheral heavy-ion collisions photoproduction"   # 精炼（点击/点赞/种子）
-    - "point cloud self-supervised learning"   # 精炼（点击/点赞/种子）
-    - "gluon saturation fluctuations"   # 精炼（点击/点赞/种子）
-    - "quantum error correction distillation"   # 精炼（点击/点赞/种子）
-    - "physics-informed neural networks PDE"   # 精炼（点击/点赞/种子）
-    - "hadronic molecule photoproduction electron-ion collider"   # 探索（相邻领域）
-    - "graph neural networks self-supervised molecular dynamics"   # 探索（相邻领域）
-    - "initial state models Bayesian inference heavy-ion"   # 探索（相邻领域）
-    - "bosonic codes concatenated quantum convolutional codes"   # 探索（相邻领域）
-    - "operator learning neural integral equations"   # 探索（相邻领域）
+    - "ultraperipheral heavy-ion collisions photoproduction"   # 精炼（正向信号）
+    - "point cloud self-supervised learning"   # 精炼（正向信号）
+    - "quantum many-body spin dynamics"   # 精炼（正向信号）
+    - "gluon fluctuations saturation"   # 精炼（正向信号）
+    - "gluon saturation diffractive deep inelastic scattering"   # 探索（相邻领域）
+    - "point cloud representation learning graph neural networks"   # 探索（相邻领域）
+    - "quantum spin systems out-of-time-order correlators"   # 探索（相邻领域）
+    - "ultraperipheral collisions vector meson production"   # 探索（相邻领域）
     
     # --- 物理学：量子与原子光学 (针对量子计算与激光) ---
     - "quant-ph"        # Quantum Physics (量子物理，涵盖量子计算核心)
@@ -49,8 +47,8 @@ arxiv:
     - "cs.AI"           # Artificial Intelligence (人工智能)
     - "stat.ML"         # Machine Learning (统计类机器学习，很多硬核DL理论发在这里)
 
-  max_results_per_query: 10
-  days_lookback: 600        # 仅获取最近 N 天的论文，0 表示不限
+  max_results_per_query: 20
+  days_lookback: 900        # 仅获取最近 N 天的论文，0 表示不限
 
 
 summary:
@@ -70,7 +68,7 @@ keyword_evolution:
   #   0.5 = 均衡（默认）：50% 精炼 + 50% 探索
   #   0.7 = 激进探索
   explore_ratio: 0.50
-  total_queries: 10          # 进化后关键词总数（不含 pin 词）
+  total_queries: 8          # 进化后关键词总数（不含 pin 词）
   lookback_days: 30         # 分析近 N 天的点击记录
   min_signals_to_evolve: 3  # 有效信号总数不足时跳过
 
@@ -79,7 +77,7 @@ paths:
   history_file: "./history.json"
   output_dir:   "./reports"
   clicks_file:  "./clicks.json"   # 普通点击记录
-  likes_file:   "./likes.json"    # 点赞记录（仅点赞）
+  reactions_file: "./reactions.json"  # 赞/踩/评论记录
   seeds_file:   "./seeds.json"    # 手动添加的种子文章
 
 performance:

@@ -18,7 +18,6 @@ from modules.ai_summarizer   import AISummarizer
 from modules.report_generator import ReportGenerator
 from modules.click_tracker   import ClickTrackerServer
 from modules.keyword_evolver import KeywordEvolver
-from modules.likes_manager   import LikesManager
 
 
 def setup_logging():
@@ -54,7 +53,7 @@ def main():
     logger.info("[Step 2] 启动事件追踪服务...")
     tracker = ClickTrackerServer(
         clicks_file = paths.get("clicks_file", "./clicks.json"),
-        likes_file  = paths.get("likes_file",  "./likes.json"),
+        reactions_file = paths.get("reactions_file", "./reactions.json"),
         seeds_file  = paths.get("seeds_file",  "./seeds.json"),
         port        = port,
     )
@@ -129,15 +128,15 @@ def main():
         logger.info(f"  历史记录已保存，共 {history.count()} 篇")
 
     # ── Step 7: 确保点赞历史页存在（常驻，只生成一次）────────
-    logger.info("[Step 7] 确保点赞历史页存在...")
-    likes_path = gen.generate_likes_history()
+    logger.info("[Step 7] 确保反应历史页存在...")
+    likes_path = gen.generate_reactions_history()
     logger.info(f"  ✓ {likes_path}")
 
     # ── 完成，保持运行 ────────────────────────────────────────
     logger.info("=" * 60)
     if report_path:
         logger.info(f"  ✓ 每日简报:   {report_path}")
-    logger.info(f"  ✓ 点赞历史:   {likes_path}（纯前端，实时更新）")
+    logger.info(f"  ✓ 反应历史:   {likes_path}（纯前端，实时更新）")
     logger.info(f"  ✓ 种子管理:   http://127.0.0.1:{port}/")
     logger.info(f"  ✓ 追踪服务:   端口 {port}，Ctrl+C 停止")
     logger.info("=" * 60)
