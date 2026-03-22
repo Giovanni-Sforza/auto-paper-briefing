@@ -80,6 +80,7 @@ class ReportGenerator:
     <span>AI 客观总结</span>
     <a href="reactions_history.html" class="nav-link">⭐ 反应历史</a>
     <a href="http://127.0.0.1:{port}/" class="nav-link" target="_blank">🌱 种子管理</a>
+    <button class="nav-link nav-export" onclick="exportData()">📦 导出数据</button>
   </div>
 </div>
 
@@ -409,6 +410,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
 .nav-link{color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border-radius:100px;
   padding:3px 13px;font-size:.82rem;font-weight:600;white-space:nowrap}
 .nav-link:hover{background:rgba(255,255,255,.32)}
+.nav-export{border:none;cursor:pointer;font-family:inherit}
 .container{max-width:920px;margin:28px auto 0;padding:0 18px}
 .paper-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
   padding:24px 26px 0;margin-bottom:18px;box-shadow:var(--shadow-sm);
@@ -712,5 +714,50 @@ async function _doSubmitComment(input) {
       signal: AbortSignal.timeout(3000),
     });
   } catch(e) {}
+}
+
+// ── 导出数据 ────────────────────────────────────────────────
+async function exportData() {
+  const btn = document.querySelector(".nav-export");
+  const origText = btn.textContent;
+  btn.textContent = "⏳ 导出中…";
+  btn.disabled = true;
+
+  try {
+    const res  = await fetch(TRACKER + "/api/export", { signal: AbortSignal.timeout(10000) });
+    const data = await res.json();
+
+    // 生成文件名：apb-export-YYYYMMDD-HHmmss.json
+    const now  = new Date();
+    const pad  = n => String(n).padStart(2, "0");
+    const name = `apb-export-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`
+               + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.json`;
+
+    // 触发浏览器下载
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // 简要统计提示
+    const nReact = Object.keys(data.reactions || {}).length;
+    const nSeed  = Object.keys(data.seeds || {}).length;
+    const nHist  = Object.keys(data.history || {}).length;
+    const nClick = (data.clicks || []).length;
+    btn.textContent = `✅ 已导出`;
+    setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 3000);
+
+    console.info(`导出完成: ${nReact} 条反应 / ${nSeed} 篇种子 / ${nHist} 条历史 / ${nClick} 次点击`);
+
+  } catch(e) {
+    btn.textContent = "❌ 导出失败（追踪服务未运行？）";
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = origText; }, 4000);
+  }
 }
 """

@@ -85,6 +85,7 @@ class _Handler(BaseHTTPRequestHandler):
     clicks_file:      str  = ""
     reactions_file:   str  = ""   # 新：统一的赞/踩/评论文件
     seeds_file:       str  = ""
+    history_file:     str  = ""   # 用于导出
     react_callbacks:  list = []   # 点赞/踩回调
 
     # ── 路由分发 ─────────────────────────────────────────────
@@ -94,6 +95,8 @@ class _Handler(BaseHTTPRequestHandler):
         if   path == "/":                self._serve_seed_ui()
         elif path == "/api/reactions":   self._api_get_reactions()
         elif path == "/api/seeds":       self._api_get_seeds()
+        elif path == "/api/clicks":      self._api_get_clicks()
+        elif path == "/api/export":      self._api_export_all()
         else:                            self._respond(404, "Not Found")
 
     def do_POST(self):
@@ -215,6 +218,32 @@ class _Handler(BaseHTTPRequestHandler):
         lst = sorted(reactions.values(),
                      key=lambda r: r.get("reacted_at", ""), reverse=True)
         self._respond_json(200, lst)
+
+    # ── GET /api/clicks ──────────────────────────────────────
+
+    def _api_get_clicks(self):
+        self._respond_json(200, self._load_list(self.__class__.clicks_file))
+
+    # ── GET /api/export ──────────────────────────────────────
+
+    def _api_export_all(self):
+        """聚合所有数据文件，返回完整 JSON 供前端触发下载"""
+        from datetime import datetime as _dt
+        data = {
+            "exported_at": _dt.now().isoformat(),
+            "reactions":   self._load_dict(self.__class__.reactions_file),
+            "seeds":       self._load_dict(self.__class__.seeds_file),
+            "history":     self._load_dict(self.__class__.history_file),
+            "clicks":      self._load_list(self.__class__.clicks_file),
+        }
+        logger.info(
+            f"  [Tracker] 导出: "
+            f"{len(data['reactions'])} 条反应 / "
+            f"{len(data['seeds'])} 篇种子 / "
+            f"{len(data['history'])} 条历史 / "
+            f"{len(data['clicks'])} 条点击"
+        )
+        self._respond_json(200, data)
 
     # ── Seeds CRUD ───────────────────────────────────────────
 
@@ -516,10 +545,12 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 
 class ClickTrackerServer:
     def __init__(self, clicks_file: str, reactions_file: str = "",
-                 seeds_file: str = "", port: int = DEFAULT_PORT):
+                 seeds_file: str = "", history_file: str = "",
+                 port: int = DEFAULT_PORT):
         self.clicks_file    = clicks_file
         self.reactions_file = reactions_file
         self.seeds_file     = seeds_file
+        self.history_file   = history_file
         self.port           = port
         self._server: HTTPServer | None       = None
         self._thread: threading.Thread | None = None
@@ -528,6 +559,7 @@ class ClickTrackerServer:
         _Handler.clicks_file    = self.clicks_file
         _Handler.reactions_file = self.reactions_file
         _Handler.seeds_file     = self.seeds_file
+        _Handler.history_file   = self.history_file
         _Handler.react_callbacks = []
         # Windows 上 TIME_WAIT 会阻止端口被立刻重用，
         # allow_reuse_address=True 等价于 SO_REUSEADDR，三平台均有效
