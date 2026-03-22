@@ -90,7 +90,7 @@ class ReportGenerator:
   </div>
   <div class="footer license-footer">
     Released under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a> ·
-    <a href="https://github.com/your-repo/auto-paper-briefing" target="_blank">GitHub</a> ·
+    <a href="https://github.com/Giovanni-Sforza/auto-paper-briefing" target="_blank">GitHub</a> ·
     论文摘要版权归原作者所有，AI 总结仅供参考
   </div>
 </div>

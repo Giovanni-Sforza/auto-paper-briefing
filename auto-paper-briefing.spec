@@ -1,22 +1,30 @@
 # -*- mode: python ; coding: utf-8 -*-
-# auto-paper-briefing.spec — PyInstaller 打包配置
-# 用法：python -m PyInstaller auto-paper-briefing.spec
+# auto-paper-briefing.spec
+#
+# 本地打包：python -m PyInstaller auto-paper-briefing.spec
+# CI 打包：  由 .github/workflows/build.yml 自动触发
 
-import sys
 import os
 
 block_cipher = None
+
+# ── 主程序：auto-paper-briefing ───────────────────────────────
 
 a = Analysis(
     ['main.py'],
     pathex=['.'],
     binaries=[],
     datas=[
-        # 如果 config.yaml 已存在，打包进去作为默认配置
-        ('config.yaml', '.') if os.path.exists('config.yaml') else ('requirements.txt', '.'),
+        # modules 目录整体打包（确保所有子模块都能被找到）
+        ('modules', 'modules'),
     ],
     hiddenimports=[
         'yaml',
+        'xml.etree.ElementTree',
+        'http.server',
+        'urllib.request',
+        'urllib.parse',
+        'urllib.error',
         'modules.config_loader',
         'modules.history_manager',
         'modules.arxiv_fetcher',
@@ -27,13 +35,12 @@ a = Analysis(
         'modules.keyword_evolver',
         'modules.seed_manager',
         'modules.likes_manager',
-        # PyMuPDF（如已安装）
-        'fitz',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    # 排除不需要的大型库，减小体积
+    excludes=['tkinter', 'matplotlib', 'numpy', 'pandas', 'scipy'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -56,27 +63,33 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,          # 保留终端窗口，方便查看日志
+    console=True,           # 保留终端窗口，方便查看运行日志
     disable_windowed_traceback=False,
-    argv_emulation=False,
+    argv_emulation=False,   # macOS 专用，False 避免双击行为异常
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    # Windows 图标（可选，替换为你自己的 .ico 文件）
-    # icon='icon.ico',
 )
 
-# ── setup 向导的单独打包 ──────────────────────────────────────
+# ── 初始化向导：apb-setup ─────────────────────────────────────
 
 a_setup = Analysis(
     ['setup.py'],
     pathex=['.'],
     binaries=[],
     datas=[],
-    hiddenimports=['yaml'],
+    hiddenimports=[
+        'yaml',
+        'xml.etree.ElementTree',
+        'http.server',
+        'urllib.request',
+        'webbrowser',
+        'threading',
+    ],
     hookspath=[],
+    hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['tkinter', 'matplotlib', 'numpy', 'pandas'],
     cipher=block_cipher,
 )
 
@@ -94,5 +107,5 @@ exe_setup = EXE(
     strip=False,
     upx=True,
     console=True,
-    # icon='icon.ico',
+    argv_emulation=False,
 )
