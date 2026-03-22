@@ -36,6 +36,10 @@ jobs:
             platform_name: windows
             artifact_suffix: windows-x86_64
 
+          - os: macos-13          # Intel Mac（x86_64）
+            platform_name: macos-intel
+            artifact_suffix: macos-intel
+
           - os: macos-14          # Apple Silicon Mac（arm64）
             platform_name: macos-arm64
             artifact_suffix: macos-arm64
@@ -56,10 +60,19 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller
-          pip install PyYAML
-          # PyMuPDF 在部分平台 CI 上编译耗时较长，按需启用
+          pip install pyinstaller certifi PyYAML
           pip install PyMuPDF || echo "PyMuPDF 安装失败，将使用降级 PDF 解析"
+
+      # ── 3b. macOS 证书修复 ─────────────────────────────────────
+      # macOS 上 Python 的 SSL 证书与系统不互通，需要单独安装
+      - name: Install macOS certificates
+        if: startsWith(matrix.platform_name, 'macos')
+        run: |
+          # 运行 Python 官方安装包附带的证书安装脚本
+          CERT_SCRIPT=$(python3 -c "import certifi; print(certifi.where())")
+          echo "certifi CA bundle: $CERT_SCRIPT"
+          # 额外：确保系统 openssl 也能找到证书
+          pip install --upgrade certifi
 
       # ── 4. 安装 UPX（可选，用于压缩可执行文件体积）───────────────
       - name: Install UPX (Linux)

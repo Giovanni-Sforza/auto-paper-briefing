@@ -5,21 +5,36 @@
 # CI 打包：  由 .github/workflows/build.yml 自动触发
 
 import os
+import sys
 
 block_cipher = None
 
+# ── 获取 certifi CA 证书路径（打包时写入，运行时读取）─────────────
+try:
+    import certifi
+    certifi_cacert = (certifi.where(), "certifi")   # (源路径, 打包后目标目录)
+    certifi_hidden = ['certifi']
+except ImportError:
+    certifi_cacert = None
+    certifi_hidden = []
+    print("WARNING: certifi not installed. SSL may fail on macOS after packaging.")
+    print("         Run: pip install certifi")
+
 # ── 主程序：auto-paper-briefing ───────────────────────────────
+
+_datas_main = [('modules', 'modules')]
+if certifi_cacert:
+    _datas_main.append(certifi_cacert)
 
 a = Analysis(
     ['main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[
-        # modules 目录整体打包（确保所有子模块都能被找到）
-        ('modules', 'modules'),
-    ],
+    datas=_datas_main,
     hiddenimports=[
         'yaml',
+        'certifi',
+        'ssl',
         'xml.etree.ElementTree',
         'http.server',
         'urllib.request',
@@ -34,12 +49,10 @@ a = Analysis(
         'modules.click_tracker',
         'modules.keyword_evolver',
         'modules.seed_manager',
-        'modules.likes_manager',
-    ],
+    ] + certifi_hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    # 排除不需要的大型库，减小体积
     excludes=['tkinter', 'matplotlib', 'numpy', 'pandas', 'scipy'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -63,9 +76,9 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,           # 保留终端窗口，方便查看运行日志
+    console=True,
     disable_windowed_traceback=False,
-    argv_emulation=False,   # macOS 专用，False 避免双击行为异常
+    argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
@@ -73,19 +86,25 @@ exe = EXE(
 
 # ── 初始化向导：apb-setup ─────────────────────────────────────
 
+_datas_setup = []
+if certifi_cacert:
+    _datas_setup.append(certifi_cacert)
+
 a_setup = Analysis(
     ['setup.py'],
     pathex=['.'],
     binaries=[],
-    datas=[],
+    datas=_datas_setup,
     hiddenimports=[
         'yaml',
+        'certifi',
+        'ssl',
         'xml.etree.ElementTree',
         'http.server',
         'urllib.request',
         'webbrowser',
         'threading',
-    ],
+    ] + certifi_hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

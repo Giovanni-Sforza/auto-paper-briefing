@@ -4,6 +4,37 @@ Auto-Paper-Briefing v5
 用法: python main.py [--config config.yaml] [--evolve-only] [--no-evolve] [--no-setup-prompt]
 """
 
+# ── SSL 证书修复（PyInstaller 打包后 macOS 常见问题）────────────
+# 必须在任何 urllib / http 调用之前执行
+import os as _os
+import ssl as _ssl
+
+def _patch_ssl():
+    """
+    打包为可执行文件后，macOS 系统 SSL 证书路径与 Python 内置路径不一致。
+    优先使用 certifi 提供的 CA bundle；不可用时回退到系统证书。
+    直接运行 Python 脚本时此函数基本无副作用。
+    """
+    try:
+        import certifi
+        cert_path = certifi.where()
+        _os.environ.setdefault("SSL_CERT_FILE", cert_path)
+        _os.environ.setdefault("REQUESTS_CA_BUNDLE", cert_path)
+        # 同时替换默认 SSL context，覆盖 urllib 的全局行为
+        _ssl._create_default_https_context = (
+            lambda: _ssl.create_default_context(cafile=cert_path)
+        )
+    except ImportError:
+        # certifi 未安装时，尝试 macOS 系统证书路径
+        system_cert = "/etc/ssl/cert.pem"          # macOS / Linux
+        if not _os.path.exists(system_cert):
+            system_cert = "/etc/ssl/certs/ca-certificates.crt"   # Ubuntu
+        if _os.path.exists(system_cert):
+            _os.environ.setdefault("SSL_CERT_FILE", system_cert)
+
+_patch_ssl()
+
+
 import argparse
 import sys
 import os

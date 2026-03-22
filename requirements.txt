@@ -5,6 +5,9 @@
 # 配置文件解析
 PyYAML>=6.0
 
+# SSL 证书（解决 macOS 打包后 CERTIFICATE_VERIFY_FAILED）
+certifi>=2024.2.2
+
 # PDF 文本提取（推荐，可选）
 # 如无法安装，系统会自动降级到 pdfminer 或内置基础提取
 PyMuPDF>=1.23.0

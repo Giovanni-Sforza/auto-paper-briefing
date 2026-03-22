@@ -11,6 +11,23 @@ setup.py — Auto-Paper-Briefing 初始化配置向导
   python setup.py --config my_config.yaml  # 生成到指定路径
 """
 
+
+# ── SSL 证书修复（同 main.py）──────────────────────────────────
+import os as _os, ssl as _ssl
+def _patch_ssl():
+    try:
+        import certifi
+        cp = certifi.where()
+        _os.environ.setdefault("SSL_CERT_FILE", cp)
+        _os.environ.setdefault("REQUESTS_CA_BUNDLE", cp)
+        _ssl._create_default_https_context = lambda: _ssl.create_default_context(cafile=cp)
+    except ImportError:
+        for p in ("/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt"):
+            if _os.path.exists(p):
+                _os.environ.setdefault("SSL_CERT_FILE", p)
+                break
+_patch_ssl()
+
 import argparse
 import json
 import os
@@ -736,7 +753,7 @@ function validateCurrentStep() {
 // ── Step 1: 服务商快选 ───────────────────────────────────────
 const PROVIDERS = {
   openai:   { url:"https://api.openai.com/v1",  model:"gpt-4o-mini",      key:"" },
-  deepseek: { url:"https://api.deepseek.com/v1", model:"deepseek-chat",   key:"" },
+  deepseek: { url:"https://api.deepseek.com", model:"deepseek-chat",   key:"" },
   aliyun:   { url:"https://dashscope.aliyuncs.com/compatible-mode/v1",
                model:"qwen-plus", key:"" },
   ollama:   { url:"http://localhost:11434/v1",   model:"llama3",          key:"ollama" },
