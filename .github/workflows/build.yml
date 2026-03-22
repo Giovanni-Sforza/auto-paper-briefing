@@ -1,0 +1,197 @@
+name: Build Executables
+
+# ── 触发条件 ────────────────────────────────────────────────────
+on:
+  # 推送 tag（如 v1.0.0）时自动构建并发布 Release
+  push:
+    tags:
+      - 'v*.*.*'
+
+  # 手动触发（在 GitHub 网页上点 "Run workflow"）
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: '发布版本号（如 v1.0.0），留空则只构建不发布'
+        required: false
+        default: ''
+
+# ── 权限：允许创建 Release ───────────────────────────────────────
+permissions:
+  contents: write
+
+# ── 构建矩阵 ────────────────────────────────────────────────────
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false          # 一个平台失败不取消其他平台
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform_name: linux
+            artifact_suffix: linux-x86_64
+
+          - os: windows-latest
+            platform_name: windows
+            artifact_suffix: windows-x86_64
+
+          - os: macos-13          # Intel Mac（x86_64）
+            platform_name: macos-intel
+            artifact_suffix: macos-intel
+
+          - os: macos-14          # Apple Silicon Mac（arm64）
+            platform_name: macos-arm64
+            artifact_suffix: macos-arm64
+
+    steps:
+      # ── 1. 检出代码 ────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. 安装 Python ─────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # ── 3. 安装依赖 ────────────────────────────────────────────
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install PyYAML
+          # PyMuPDF 在部分平台 CI 上编译耗时较长，按需启用
+          pip install PyMuPDF || echo "PyMuPDF 安装失败，将使用降级 PDF 解析"
+
+      # ── 4. 安装 UPX（可选，用于压缩可执行文件体积）───────────────
+      - name: Install UPX (Linux)
+        if: matrix.platform_name == 'linux'
+        run: sudo apt-get install -y upx-ucl
+
+      - name: Install UPX (Windows)
+        if: matrix.platform_name == 'windows'
+        run: choco install upx --no-progress
+
+      - name: Install UPX (macOS)
+        if: startsWith(matrix.platform_name, 'macos')
+        run: brew install upx || echo "UPX 安装失败，跳过压缩"
+
+      # ── 5. 运行 PyInstaller ────────────────────────────────────
+      - name: Build with PyInstaller
+        run: python -m PyInstaller auto-paper-briefing.spec --clean --noconfirm
+
+      # ── 6. 列出产物（调试用）──────────────────────────────────
+      - name: List dist directory
+        shell: bash
+        run: ls -lh dist/
+
+      # ── 7. 打包产物（tar.gz / zip）────────────────────────────
+      - name: Package artifacts (Linux / macOS)
+        if: matrix.platform_name != 'windows'
+        shell: bash
+        run: |
+          cd dist
+          chmod +x auto-paper-briefing apb-setup 2>/dev/null || true
+          tar -czf ../apb-${{ matrix.artifact_suffix }}.tar.gz \
+              auto-paper-briefing apb-setup
+          echo "打包完成: apb-${{ matrix.artifact_suffix }}.tar.gz"
+
+      - name: Package artifacts (Windows)
+        if: matrix.platform_name == 'windows'
+        shell: pwsh
+        run: |
+          cd dist
+          Compress-Archive -Path auto-paper-briefing.exe, apb-setup.exe `
+            -DestinationPath ../apb-${{ matrix.artifact_suffix }}.zip
+          Write-Host "打包完成: apb-${{ matrix.artifact_suffix }}.zip"
+
+      # ── 8. 上传 Artifact（可在 Actions 页面下载）──────────────
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apb-${{ matrix.artifact_suffix }}
+          path: |
+            apb-${{ matrix.artifact_suffix }}.tar.gz
+            apb-${{ matrix.artifact_suffix }}.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  # ── 发布 Release（仅在 tag 推送或手动指定版本号时执行）────────────
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    # 条件：tag 触发，或手动触发且填写了版本号
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != '')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 确定版本号
+      - name: Determine version tag
+        id: version
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+          fi
+
+      # 下载所有平台的构建产物
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets/
+          merge-multiple: true
+
+      - name: List release assets
+        run: ls -lh release-assets/
+
+      # 读取 CHANGELOG（如果存在）作为 Release 说明
+      - name: Read release notes
+        id: notes
+        shell: bash
+        run: |
+          if [ -f "CHANGELOG.md" ]; then
+            # 提取最新版本的 changelog
+            NOTES=$(awk '/^## \[/{if(p)exit; p=1} p' CHANGELOG.md | head -50)
+            echo "notes<<EOF" >> $GITHUB_OUTPUT
+            echo "$NOTES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo 'notes=Auto-built by GitHub Actions.' >> $GITHUB_OUTPUT
+          fi
+
+      # 创建 Release 并上传所有平台产物
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Auto-Paper-Briefing ${{ steps.version.outputs.tag }}
+          body: |
+            ## 下载说明
+
+            | 平台 | 文件 | 说明 |
+            |------|------|------|
+            | 🪟 Windows | `apb-windows-x86_64.zip` | 解压后双击 `apb-setup.exe` 初始化，再运行 `auto-paper-briefing.exe` |
+            | 🍎 macOS (Intel) | `apb-macos-intel.tar.gz` | 解压后 `./apb-setup` 初始化，再 `./auto-paper-briefing` |
+            | 🍎 macOS (Apple Silicon) | `apb-macos-arm64.tar.gz` | M1/M2/M3 Mac 专用版本 |
+            | 🐧 Linux | `apb-linux-x86_64.tar.gz` | x86_64 通用版本 |
+
+            ## 首次使用
+            1. 下载对应平台的压缩包并解压
+            2. 运行 `apb-setup`（初始化向导，填写 API Key 和关键词）
+            3. 运行 `auto-paper-briefing` 开始追踪论文
+
+            ${{ steps.notes.outputs.notes }}
+
+          files: release-assets/*
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.tag, '-') }}
+          # 包含 '-' 的 tag（如 v1.0.0-beta）自动标记为预发布
