@@ -359,9 +359,8 @@ python main.py --no-setup-prompt
 | 🍎 macOS Apple Silicon | `apb-macos-arm64.tar.gz` |
 | 🐧 Linux | `apb-linux-x86_64.tar.gz` |
 
-朋友下载对应平台的压缩包，解压后先运行 `apb-setup`（配置向导），再运行 `auto-paper-briefing`（主程序），无需安装任何依赖。
+下载对应平台的压缩包，解压后先运行 `apb-setup`（配置向导），再运行 `auto-paper-briefing`（主程序），无需安装任何依赖。
 
-详细说明见 `BUILD.md`。
 
 
 ---
