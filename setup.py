@@ -840,7 +840,7 @@ function toggleCat(btn) {
 function syncCustomCats() {
   const raw = document.getElementById("catCustom").value;
   // 以空格、逗号、中文逗号为分隔符
-  const tokens = raw.split(/[ \t\r\n,，]+/).map(s => s.trim()).filter(Boolean);
+  const tokens = raw.split(/[,\uff0c \t]+/).map(s => s.trim()).filter(Boolean);
   // 清除上一次自定义输入添加的分类（不影响按钮选中的）
   // 通过比对按钮集合：凡不在按钮上但在 selectedCats 中的，都是自定义输入的
   const btnCats = new Set(
