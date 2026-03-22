@@ -529,8 +529,13 @@ class ClickTrackerServer:
         _Handler.reactions_file = self.reactions_file
         _Handler.seeds_file     = self.seeds_file
         _Handler.react_callbacks = []
+        # Windows 上 TIME_WAIT 会阻止端口被立刻重用，
+        # allow_reuse_address=True 等价于 SO_REUSEADDR，三平台均有效
+        class _ReusableHTTPServer(HTTPServer):
+            allow_reuse_address = True
+
         try:
-            self._server = HTTPServer(("127.0.0.1", self.port), _Handler)
+            self._server = _ReusableHTTPServer(("127.0.0.1", self.port), _Handler)
             self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
             self._thread.start()
             logger.info(f"  [Tracker] 服务已启动 → http://127.0.0.1:{self.port}")

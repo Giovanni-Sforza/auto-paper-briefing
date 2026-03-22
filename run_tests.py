@@ -179,20 +179,35 @@ class TestArxivFetcher(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════
 
 class TestClickTracker(unittest.TestCase):
-    PORT      = 19530
+    # 整个测试类共用一个服务实例（setUpClass），避免 Windows 上的端口 TIME_WAIT 问题
+    server    = None
+    PORT      = None
     CLICKS    = os.path.join(tempfile.gettempdir(), "test_clicks_apb.json")
     REACTIONS = os.path.join(tempfile.gettempdir(), "test_reactions_apb.json")
     SEEDS     = os.path.join(tempfile.gettempdir(), "test_seeds_apb.json")
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        import socket
         from modules.click_tracker import ClickTrackerServer
-        self.server = ClickTrackerServer(
-            self.CLICKS, self.REACTIONS, self.SEEDS, port=self.PORT)
-        self.server.start()
-        time.sleep(0.3)
+        # 让 OS 分配一个空闲端口，彻底避免冲突
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            cls.PORT = s.getsockname()[1]
+        cls.server = ClickTrackerServer(
+            cls.CLICKS, cls.REACTIONS, cls.SEEDS, port=cls.PORT)
+        cls.server.start()
+        time.sleep(0.4)
 
-    def tearDown(self):
-        self.server.stop()
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server:
+            cls.server.stop()
+        for f in [cls.CLICKS, cls.REACTIONS, cls.SEEDS]:
+            if os.path.exists(f): os.remove(f)
+
+    def setUp(self):
+        # 每个测试前清空数据文件，保证测试隔离
         for f in [self.CLICKS, self.REACTIONS, self.SEEDS]:
             if os.path.exists(f): os.remove(f)
 
