@@ -154,17 +154,26 @@ def maybe_run_setup(config_path: str, force: bool = False) -> bool:
 
 def _launch_setup(config_path: str):
     """
-    启动 setup.py 向导进程，等待其退出。
-    向导只会覆写 config.yaml，不碰数据文件。
+    启动配置向导。
+    打包模式下直接 import setup 模块并调用其 main()，
+    不依赖外部 .py 文件，兼容 PyInstaller 封装后的可执行程序。
     """
-    setup_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "setup.py")
-    if not os.path.exists(setup_script):
-        print("  [警告] 未找到 setup.py，跳过向导")
-        return
     print()
-    cmd = [sys.executable, setup_script, "--config", config_path]
     try:
-        subprocess.run(cmd, check=False)
+        # 打包模式（PyInstaller）和直接运行都能找到 setup 模块
+        import setup as _setup
+        import sys as _sys
+        # 临时覆盖 sys.argv，让 setup.main() 使用正确的 config 路径
+        _orig_argv = _sys.argv[:]
+        _sys.argv = ["apb-setup", "--config", config_path]
+        try:
+            _setup.main()
+        finally:
+            _sys.argv = _orig_argv
+    except ImportError:
+        print("  [警告] 未找到配置向导模块（setup），跳过")
+    except SystemExit:
+        pass   # setup.main() 正常退出时会调用 sys.exit(0)，此处忽略
     except Exception as e:
         print(f"  [警告] 向导运行失败: {e}")
     print()
@@ -313,7 +322,7 @@ def main():
     likes_path = gen.generate_reactions_history()
     logger.info(f"  ✓ {likes_path}")
 
-    # ── 完成，保持运行 ────────────────────────────────────────
+    # ── 完成，自动打开简报，然后保持运行 ────────────────────────
     logger.info("=" * 60)
     if report_path:
         logger.info(f"  ✓ 每日简报:   {report_path}")
@@ -321,6 +330,20 @@ def main():
     logger.info(f"  ✓ 种子管理:   http://127.0.0.1:{port}/")
     logger.info(f"  ✓ 追踪服务:   端口 {port}，Ctrl+C 停止")
     logger.info("=" * 60)
+
+    # 自动用系统默认浏览器打开今日简报（打开前稍等确保追踪服务已就绪）
+    _html_to_open = report_path or likes_path
+    if _html_to_open:
+        import webbrowser as _wb
+        import threading as _th
+        def _open_browser():
+            time.sleep(0.8)   # 等追踪服务完全启动
+            try:
+                _wb.open(Path(_html_to_open).resolve().as_uri())
+                logger.info(f"  已在浏览器中打开: {_html_to_open}")
+            except Exception as _e:
+                logger.warning(f"  无法自动打开浏览器: {_e}")
+        _th.Thread(target=_open_browser, daemon=True).start()
 
     try:
         while True:
