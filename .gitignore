@@ -9,3 +9,4 @@ seeds.json
 *.pyc
 modules/__pycache__
 reactions.json
+config_original.yaml

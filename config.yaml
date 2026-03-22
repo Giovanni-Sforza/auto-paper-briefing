@@ -3,61 +3,40 @@
 # ============================================================
 
 ai:
-  base_url: " https://api.deepseek.com"
-
-  # 你的 API Key（强烈建议通过环境变量 AI_API_KEY 传入，此处留空时自动读取环境变量）
-  api_key: ""
+  base_url: "https://api.deepseek.com"
+  # OpenAI:   https://api.openai.com/v1
+  # DeepSeek: https://api.deepseek.com
+  # 阿里云:    https://dashscope.aliyuncs.com/compatible-mode/v1
+  # Ollama:   http://localhost:11434/v1
+  api_key: ""            # 留空则读取环境变量 AI_API_KEY
   model: "deepseek-chat"
   temperature: 0.1
-  max_tokens: 3000
+  max_tokens: 2000
 
 arxiv:
-  # 检索关键词列表（支持精确匹配和逻辑运算）
+  # 关键词列表：
+  #   普通字符串 → 会被关键词进化系统动态更新
+  #   {query: "xxx", pin: true} → 固定，永不被替换
   queries:
-    - "ultraperipheral heavy-ion collisions photoproduction"   # 精炼（正向信号）
-    - "point cloud self-supervised learning"   # 精炼（正向信号）
-    - "quantum many-body spin dynamics"   # 精炼（正向信号）
-    - "gluon saturation fluctuations"   # 精炼（正向信号）
-    - "gluon saturation CGC initial state heavy-ion collisions"   # 探索（相邻领域）
-    - "point cloud representation learning geometric deep learning"   # 探索（相邻领域）
-    - "quantum spin systems out-of-equilibrium dynamics thermalization"   # 探索（相邻领域）
-    - "self-supervised learning 3D vision transformer"   # 探索（相邻领域）
-    
-    # --- 物理学：量子与原子光学 (针对量子计算与激光) ---
-    - "quant-ph"        # Quantum Physics (量子物理，涵盖量子计算核心)
-
-
+    - "large language model reasoning"
+    - "multimodal foundation model"
+    - "reinforcement learning from human feedback"
 
   categories:
-    - "nucl-th"         # Nuclear Theory (核理论，核结构与高能核物理的核心)
-    - "nucl-ex"         # Nuclear Experiment (核实验)
-    - "hep-ph"
-    # --- 物理学：高能物理 ---
-    - "hep-ph"          # High Energy Physics - Phenomenology (高能物理现象学)
-    - "hep-ex"          # High Energy Physics - Experiment (高能物理实验)
-    - "hep-th"          # High Energy Physics - Theory (高能物理理论)
-    
-    # --- 物理学：量子与原子光学 (针对量子计算与激光) ---
-    - "quant-ph"        # Quantum Physics (量子物理，涵盖量子计算核心)
-    - "physics.atom-ph" # Atomic Physics (原子物理，常涉及激光与原子核的相互作用)
-    - "physics.optics"  # Optics (光学，包含强激光场研究)
-    
-    # --- 计算机科学：深度学习 ---
-    - "cs.LG"           # Machine Learning (CS类机器学习)
-    - "cs.AI"           # Artificial Intelligence (人工智能)
-    - "stat.ML"         # Machine Learning (统计类机器学习，很多硬核DL理论发在这里)
+    - "cs.AI"
+    - "cs.LG"
+    - "cs.CL"
 
   max_results_per_query: 5
-  days_lookback: 900        # 仅获取最近 N 天的论文，0 表示不限
-
+  days_lookback: 7
 
 summary:
   dimensions:
-    - "研究背景与核心动机：该研究试图解决什么关键物理现象或计算瓶颈？现有理论模型、实验手段或算法架构存在什么局限性？"
-    - "核心理论、模型与技术方案：论文提出了什么新的理论框架（如有效场论）、实验机制（如特定的激光-原子核相互作用）、或算法架构（如新型神经网络/量子线路）？关键创新点是什么？"
-    - "实验装置、模拟环境与数据基础：该研究依赖怎样的验证条件？（若是物理研究：使用了什么加速器、激光设施、探测器或蒙特卡洛模拟软件？若是算法研究：使用了什么数据集、基准测试或量子硬件？）"
-    - "核心观测结果与量化表现：实验或推导得出了什么关键结论？（例如：观测到了什么新的能级/截面/相变现象？或者在模型精度、量子纠错率等指标上取得了怎样的量化突破？）"
-    - "误差分析、局限性与物理意义：论文明确指出了哪些理论近似误差、实验系统误差或算法局限性？该工作对所在领域（如完善核力模型或提升AI推理能力）有什么实质性的物理/理论意义？"
+    - "研究背景与动机：该研究试图解决什么问题？现有方法的局限性是什么？"
+    - "核心方法与技术：论文提出了什么方法、模型或框架？关键技术点是什么？"
+    - "实验设置：使用了哪些数据集？评测指标是什么？对比了哪些基线方法？"
+    - "主要实验结论：在各项指标上取得了怎样的量化结果？"
+    - "研究局限性：论文中明确指出了哪些局限性或未来工作方向？"
 
 click_tracking:
   port: 19523
