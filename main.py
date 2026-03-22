@@ -83,7 +83,7 @@ def main():
 
     logger.info("[Step 5] 向 arXiv 检索（分页去重模式）...")
     history_ids = set(history._records.keys())  # 传给 fetcher，翻页时实时过滤
-    new_papers  = ArxivFetcher(config["arxiv"]).fetch(history_ids=history_ids)
+    new_papers  = ArxivFetcher(config["arxiv"], ai_config=config["ai"]).fetch(history_ids=history_ids)
     logger.info(f"  检索完成，共 {len(new_papers)} 篇新论文")
 
     gen         = ReportGenerator(config)

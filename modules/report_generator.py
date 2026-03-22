@@ -88,6 +88,11 @@ class ReportGenerator:
   <div class="footer">
     Auto-Paper-Briefing · {date_display} · 客观信息提取，不含主观评价
   </div>
+  <div class="footer license-footer">
+    Released under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a> ·
+    <a href="https://github.com/your-repo/auto-paper-briefing" target="_blank">GitHub</a> ·
+    论文摘要版权归原作者所有，AI 总结仅供参考
+  </div>
 </div>
 
 <script>
@@ -474,6 +479,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
 .comment-skip:hover{color:var(--text)}
 .empty-state{text-align:center;padding:70px 20px;color:var(--muted)}
 .footer{text-align:center;margin-top:44px;font-size:.78rem;color:var(--muted)}
+.license-footer{margin-top:8px;font-size:.74rem}
+.license-footer a{color:var(--accent);text-decoration:none}
+.license-footer a:hover{text-decoration:underline}
 """
 
 REACTIONS_CSS = """

@@ -17,11 +17,11 @@ arxiv:
     - "ultraperipheral heavy-ion collisions photoproduction"   # 精炼（正向信号）
     - "point cloud self-supervised learning"   # 精炼（正向信号）
     - "quantum many-body spin dynamics"   # 精炼（正向信号）
-    - "gluon fluctuations saturation"   # 精炼（正向信号）
-    - "gluon saturation diffractive deep inelastic scattering"   # 探索（相邻领域）
-    - "point cloud representation learning graph neural networks"   # 探索（相邻领域）
-    - "quantum spin systems out-of-time-order correlators"   # 探索（相邻领域）
-    - "ultraperipheral collisions vector meson production"   # 探索（相邻领域）
+    - "gluon saturation fluctuations"   # 精炼（正向信号）
+    - "gluon saturation CGC initial state heavy-ion collisions"   # 探索（相邻领域）
+    - "point cloud representation learning geometric deep learning"   # 探索（相邻领域）
+    - "quantum spin systems out-of-equilibrium dynamics thermalization"   # 探索（相邻领域）
+    - "self-supervised learning 3D vision transformer"   # 探索（相邻领域）
     
     # --- 物理学：量子与原子光学 (针对量子计算与激光) ---
     - "quant-ph"        # Quantum Physics (量子物理，涵盖量子计算核心)
@@ -47,7 +47,7 @@ arxiv:
     - "cs.AI"           # Artificial Intelligence (人工智能)
     - "stat.ML"         # Machine Learning (统计类机器学习，很多硬核DL理论发在这里)
 
-  max_results_per_query: 20
+  max_results_per_query: 5
   days_lookback: 900        # 仅获取最近 N 天的论文，0 表示不限
 
 
