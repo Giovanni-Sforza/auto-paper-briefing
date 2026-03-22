@@ -10,6 +10,7 @@ import json
 import time
 import unittest
 import unittest.mock as mock
+import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,7 +43,7 @@ def make_arxiv_xml(ids: list[str], total: int) -> bytes:
 
 class TestHistoryManager(unittest.TestCase):
     def setUp(self):
-        self.path = "/tmp/test_history_apb.json"
+        self.path = os.path.join(tempfile.gettempdir(), "test_history_apb.json")
 
     def tearDown(self):
         if os.path.exists(self.path):
@@ -179,9 +180,9 @@ class TestArxivFetcher(unittest.TestCase):
 
 class TestClickTracker(unittest.TestCase):
     PORT      = 19530
-    CLICKS    = "/tmp/test_clicks_apb.json"
-    REACTIONS = "/tmp/test_reactions_apb.json"
-    SEEDS     = "/tmp/test_seeds_apb.json"
+    CLICKS    = os.path.join(tempfile.gettempdir(), "test_clicks_apb.json")
+    REACTIONS = os.path.join(tempfile.gettempdir(), "test_reactions_apb.json")
+    SEEDS     = os.path.join(tempfile.gettempdir(), "test_seeds_apb.json")
 
     def setUp(self):
         from modules.click_tracker import ClickTrackerServer
@@ -256,7 +257,7 @@ class TestClickTracker(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════
 
 class TestReportGenerator(unittest.TestCase):
-    OUT = "/tmp/test_rg_apb"
+    OUT = os.path.join(tempfile.gettempdir(), "test_rg_apb")
 
     def setUp(self):
         os.makedirs(self.OUT, exist_ok=True)
@@ -309,8 +310,8 @@ class TestReportGenerator(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════
 
 class TestSetupWizard(unittest.TestCase):
-    CONFIG = "/tmp/test_setup_config_apb.yaml"
-    SEEDS  = "/tmp/test_setup_seeds_apb.json"
+    CONFIG = os.path.join(tempfile.gettempdir(), "test_setup_config_apb.yaml")
+    SEEDS  = os.path.join(tempfile.gettempdir(), "test_setup_seeds_apb.json")
 
     def tearDown(self):
         for f in [self.CONFIG, self.SEEDS]:
@@ -362,8 +363,8 @@ class TestSetupWizard(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════
 
 class TestMigrateLikes(unittest.TestCase):
-    LIKES     = "/tmp/test_migrate_likes_apb.json"
-    REACTIONS = "/tmp/test_migrate_reactions_apb.json"
+    LIKES     = os.path.join(tempfile.gettempdir(), "test_migrate_likes_apb.json")
+    REACTIONS = os.path.join(tempfile.gettempdir(), "test_migrate_reactions_apb.json")
 
     def tearDown(self):
         for f in [self.LIKES, self.REACTIONS, self.LIKES+".bak"]:
