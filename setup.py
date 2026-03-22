@@ -376,10 +376,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
   background:transparent;font-family:inherit;padding:2px 4px}
 
 /* 分类复选 */
-.cat-grid{display:flex;flex-wrap:wrap;gap:8px}
-.cat-btn{padding:5px 13px;border:1px solid var(--border);border-radius:100px;
-  font-size:.8rem;cursor:pointer;transition:all .15s;background:var(--bg)}
+.cat-section{margin-bottom:10px}
+.cat-section-label{font-size:.75rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.cat-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2px}
+.cat-btn{padding:4px 11px;border:1px solid var(--border);border-radius:100px;
+  font-size:.78rem;cursor:pointer;transition:all .15s;background:var(--bg);white-space:nowrap}
 .cat-btn.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+.cat-custom{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);
+  font-size:.85rem;outline:none;font-family:monospace;margin-top:4px}
+.cat-custom:focus{border-color:var(--accent)}
 
 /* 种子文章 */
 .seed-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);
@@ -497,19 +503,91 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
     </div>
 
     <div class="field">
-      <label>arXiv 分类过滤（可多选）</label>
-      <div class="cat-grid" id="catGrid">
-        <button class="cat-btn active" data-cat="cs.AI" onclick="toggleCat(this)">cs.AI</button>
-        <button class="cat-btn active" data-cat="cs.LG" onclick="toggleCat(this)">cs.LG</button>
-        <button class="cat-btn active" data-cat="cs.CL" onclick="toggleCat(this)">cs.CL</button>
-        <button class="cat-btn" data-cat="cs.CV" onclick="toggleCat(this)">cs.CV</button>
-        <button class="cat-btn" data-cat="cs.RO" onclick="toggleCat(this)">cs.RO</button>
-        <button class="cat-btn" data-cat="cs.NE" onclick="toggleCat(this)">cs.NE</button>
-        <button class="cat-btn" data-cat="stat.ML" onclick="toggleCat(this)">stat.ML</button>
-        <button class="cat-btn" data-cat="eess.SP" onclick="toggleCat(this)">eess.SP</button>
-        <button class="cat-btn" data-cat="q-bio.NC" onclick="toggleCat(this)">q-bio.NC</button>
+      <label>
+        arXiv 分类过滤（可多选）
+        <a href="https://arxiv.org/category_taxonomy" target="_blank"
+          style="font-weight:400;font-size:.78rem;color:var(--accent);margin-left:6px">
+          📋 查看完整分类列表 ↗
+        </a>
+      </label>
+
+      <div class="cat-section">
+        <div class="cat-section-label">💻 计算机科学 (cs.*)</div>
+        <div class="cat-grid">
+          <button class="cat-btn active" data-cat="cs.AI"  onclick="toggleCat(this)">cs.AI · 人工智能</button>
+          <button class="cat-btn active" data-cat="cs.LG"  onclick="toggleCat(this)">cs.LG · 机器学习</button>
+          <button class="cat-btn active" data-cat="cs.CL"  onclick="toggleCat(this)">cs.CL · 计算语言学</button>
+          <button class="cat-btn"        data-cat="cs.CV"  onclick="toggleCat(this)">cs.CV · 计算机视觉</button>
+          <button class="cat-btn"        data-cat="cs.RO"  onclick="toggleCat(this)">cs.RO · 机器人</button>
+          <button class="cat-btn"        data-cat="cs.NE"  onclick="toggleCat(this)">cs.NE · 神经与演化计算</button>
+          <button class="cat-btn"        data-cat="cs.IR"  onclick="toggleCat(this)">cs.IR · 信息检索</button>
+          <button class="cat-btn"        data-cat="cs.HC"  onclick="toggleCat(this)">cs.HC · 人机交互</button>
+          <button class="cat-btn"        data-cat="cs.CR"  onclick="toggleCat(this)">cs.CR · 密码与安全</button>
+          <button class="cat-btn"        data-cat="cs.SE"  onclick="toggleCat(this)">cs.SE · 软件工程</button>
+        </div>
       </div>
-      <div class="hint" style="margin-top:8px">不选则不限制分类，会覆盖范围更广但可能引入不相关文章。</div>
+
+      <div class="cat-section">
+        <div class="cat-section-label">📊 统计学 (stat.*)</div>
+        <div class="cat-grid">
+          <button class="cat-btn" data-cat="stat.ML" onclick="toggleCat(this)">stat.ML · 机器学习</button>
+          <button class="cat-btn" data-cat="stat.AP" onclick="toggleCat(this)">stat.AP · 应用统计</button>
+          <button class="cat-btn" data-cat="stat.ME" onclick="toggleCat(this)">stat.ME · 方法论</button>
+        </div>
+      </div>
+
+      <div class="cat-section">
+        <div class="cat-section-label">⚡ 电气工程 (eess.*)</div>
+        <div class="cat-grid">
+          <button class="cat-btn" data-cat="eess.SP" onclick="toggleCat(this)">eess.SP · 信号处理</button>
+          <button class="cat-btn" data-cat="eess.IV" onclick="toggleCat(this)">eess.IV · 图像与视频处理</button>
+          <button class="cat-btn" data-cat="eess.AS" onclick="toggleCat(this)">eess.AS · 音频与语音处理</button>
+          <button class="cat-btn" data-cat="eess.SY" onclick="toggleCat(this)">eess.SY · 系统与控制</button>
+        </div>
+      </div>
+
+      <div class="cat-section">
+        <div class="cat-section-label">⚛️ 物理学 (physics / cond-mat / quant-ph / gr-qc / hep-* / astro-ph.*)</div>
+        <div class="cat-grid">
+          <button class="cat-btn" data-cat="physics.comp-ph"  onclick="toggleCat(this)">physics.comp-ph · 计算物理</button>
+          <button class="cat-btn" data-cat="physics.data-an"  onclick="toggleCat(this)">physics.data-an · 数据分析</button>
+          <button class="cat-btn" data-cat="cond-mat.dis-nn"  onclick="toggleCat(this)">cond-mat.dis-nn · 无序系统/神经网络</button>
+          <button class="cat-btn" data-cat="cond-mat.stat-mech" onclick="toggleCat(this)">cond-mat.stat-mech · 统计力学</button>
+          <button class="cat-btn" data-cat="quant-ph"         onclick="toggleCat(this)">quant-ph · 量子物理</button>
+          <button class="cat-btn" data-cat="gr-qc"            onclick="toggleCat(this)">gr-qc · 广义相对论</button>
+          <button class="cat-btn" data-cat="hep-th"           onclick="toggleCat(this)">hep-th · 高能物理（理论）</button>
+          <button class="cat-btn" data-cat="hep-ph"           onclick="toggleCat(this)">hep-ph · 高能物理（现象）</button>
+          <button class="cat-btn" data-cat="hep-ex"           onclick="toggleCat(this)">hep-ex · 高能物理（实验）</button>
+          <button class="cat-btn" data-cat="astro-ph.IM"      onclick="toggleCat(this)">astro-ph.IM · 仪器与方法</button>
+          <button class="cat-btn" data-cat="astro-ph.HE"      onclick="toggleCat(this)">astro-ph.HE · 高能天体物理</button>
+          <button class="cat-btn" data-cat="astro-ph.CO"      onclick="toggleCat(this)">astro-ph.CO · 宇宙学</button>
+        </div>
+      </div>
+
+      <div class="cat-section">
+        <div class="cat-section-label">🔬 数学 / 生物 / 经济 (math.* / q-bio.* / econ.*)</div>
+        <div class="cat-grid">
+          <button class="cat-btn" data-cat="math.ST"    onclick="toggleCat(this)">math.ST · 统计理论</button>
+          <button class="cat-btn" data-cat="math.OC"    onclick="toggleCat(this)">math.OC · 最优控制</button>
+          <button class="cat-btn" data-cat="math.NA"    onclick="toggleCat(this)">math.NA · 数值分析</button>
+          <button class="cat-btn" data-cat="q-bio.NC"   onclick="toggleCat(this)">q-bio.NC · 神经与认知</button>
+          <button class="cat-btn" data-cat="q-bio.QM"   onclick="toggleCat(this)">q-bio.QM · 分子网络</button>
+          <button class="cat-btn" data-cat="econ.EM"    onclick="toggleCat(this)">econ.EM · 计量经济学</button>
+          <button class="cat-btn" data-cat="econ.GN"    onclick="toggleCat(this)">econ.GN · 一般经济学</button>
+        </div>
+      </div>
+
+      <div class="cat-section">
+        <div class="cat-section-label">✏️ 自定义（空格分隔，如：cs.DS math.PR physics.flu-dyn）</div>
+        <input class="cat-custom" id="catCustom" type="text"
+          placeholder="输入额外的分类代码，用空格分隔…"
+          oninput="syncCustomCats()">
+      </div>
+
+      <div class="hint" style="margin-top:4px">
+        不选则不限制分类，覆盖范围更广但可能引入不相关文章。
+        点击标签可切换选中状态；自定义输入会自动合并到最终分类列表。
+      </div>
     </div>
 
     <!-- 高级参数 -->
@@ -751,10 +829,38 @@ function getQueries() { return [...queryTags]; }
 
 // 分类
 const selectedCats = new Set(["cs.AI","cs.LG","cs.CL"]);
+
 function toggleCat(btn) {
   const cat = btn.dataset.cat;
   if (selectedCats.has(cat)) { selectedCats.delete(cat); btn.classList.remove("active"); }
   else                        { selectedCats.add(cat);    btn.classList.add("active"); }
+}
+
+// 自定义分类输入：实时解析，合并到 selectedCats
+function syncCustomCats() {
+  const raw = document.getElementById("catCustom").value;
+  // 以空格、逗号、中文逗号为分隔符
+  const tokens = raw.split(/[ \t\r\n,，]+/).map(s => s.trim()).filter(Boolean);
+  // 清除上一次自定义输入添加的分类（不影响按钮选中的）
+  // 通过比对按钮集合：凡不在按钮上但在 selectedCats 中的，都是自定义输入的
+  const btnCats = new Set(
+    [...document.querySelectorAll(".cat-btn")].map(b => b.dataset.cat)
+  );
+  // 删掉之前自定义的
+  for (const c of [...selectedCats]) {
+    if (!btnCats.has(c)) selectedCats.delete(c);
+  }
+  // 加入新的自定义
+  for (const t of tokens) {
+    if (t) selectedCats.add(t);
+  }
+}
+
+// 汇总所有选中分类（按钮 + 自定义）
+function getAllCats() {
+  // 先同步自定义输入
+  syncCustomCats();
+  return [...selectedCats];
 }
 
 // 高级参数
@@ -822,7 +928,7 @@ function removeSeed(i) { seeds.splice(i,1); renderSeeds(); }
 
 // ── Step 4: 摘要 + 保存 ────────────────────────────────────
 function buildSummary() {
-  const cats = [...selectedCats].join(", ") || "不限";
+  const cats = getAllCats().join(", ") || "不限";
   document.getElementById("summaryBox").innerHTML = `
     <b>🤖 AI 接口</b><br>
     Base URL: ${esc(document.getElementById("baseUrl").value)}<br>
@@ -849,7 +955,7 @@ async function saveConfig() {
       },
       arxiv: {
         queries:    getQueries(),
-        categories: [...selectedCats],
+        categories: getAllCats(),
       },
       performance: {
         max_results:  parseInt(document.getElementById("maxResults").value) || 10,
