@@ -36,10 +36,6 @@ jobs:
             platform_name: windows
             artifact_suffix: windows-x86_64
 
-          - os: macos-13          # Intel Mac（x86_64）
-            platform_name: macos-intel
-            artifact_suffix: macos-intel
-
           - os: macos-14          # Apple Silicon Mac（arm64）
             platform_name: macos-arm64
             artifact_suffix: macos-arm64
