@@ -34,6 +34,19 @@ def _patch_ssl():
 
 _patch_ssl()
 
+# ── 工作目录修复（PyInstaller 打包后双击运行时 cwd 是用户主目录）──
+# 必须在加载 config.yaml 之前执行，确保所有相对路径基于程序所在目录
+def _fix_workdir():
+    import sys as _sys, os as _os
+    if getattr(_sys, "frozen", False):
+        # PyInstaller 打包模式：切换到可执行文件所在目录
+        app_dir = _os.path.dirname(_sys.executable)
+    else:
+        # 直接运行 Python 脚本：切换到脚本所在目录
+        app_dir = _os.path.dirname(_os.path.abspath(__file__))
+    _os.chdir(app_dir)
+
+_fix_workdir()
 
 import argparse
 import sys

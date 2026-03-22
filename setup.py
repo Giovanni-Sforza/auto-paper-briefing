@@ -28,6 +28,17 @@ def _patch_ssl():
                 break
 _patch_ssl()
 
+# ── 工作目录修复（同 main.py）──────────────────────────────────
+def _fix_workdir():
+    import sys as _sys, os as _os
+    if getattr(_sys, "frozen", False):
+        app_dir = _os.path.dirname(_sys.executable)
+    else:
+        app_dir = _os.path.dirname(_os.path.abspath(__file__))
+    _os.chdir(app_dir)
+
+_fix_workdir()
+
 import argparse
 import json
 import os
@@ -697,16 +708,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
     <div class="done-icon">🎉</div>
     <h2>配置完成！</h2>
     <p>config.yaml 已生成，现在可以启动主程序开始追踪论文了。</p>
-    <div class="cmd-box">
-      <div style="color:#89b4fa;margin-bottom:6px"># macOS / Linux</div>
-      python main.py<br><br>
-      <div style="color:#89b4fa;margin-bottom:6px"># Windows</div>
-      python main.py
+
+    <div style="text-align:left;margin:20px 0 8px">
+      <div style="font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:10px">
+        🖥️ 方式一：直接双击（推荐，无需配置环境）
+      </div>
+      <div style="background:#f4f5fb;border:1px solid var(--border);border-radius:var(--rs);
+        padding:12px 16px;font-size:.88rem;color:var(--text2);line-height:1.8">
+        双击 <strong>auto-paper-briefing</strong>（macOS/Linux）
+        或 <strong>auto-paper-briefing.exe</strong>（Windows）即可运行。<br>
+        文件在与本向导（apb-setup）同一目录中。
+      </div>
     </div>
-    <p style="font-size:.82rem;color:var(--muted)">
-      程序启动后，在浏览器打开 reports/ 目录下生成的 HTML 文件即可查看简报。<br>
-      种子文章管理：<a href="http://127.0.0.1:19523/" target="_blank"
-        style="color:var(--accent)">http://127.0.0.1:19523/</a>（main.py 运行后可访问）
+
+    <div style="text-align:left;margin:16px 0 8px">
+      <div style="font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:10px">
+        💻 方式二：命令行运行（已安装 Python 时）
+      </div>
+      <div class="cmd-box">
+        <div style="color:#89b4fa;margin-bottom:4px"># macOS / Linux</div>
+        python main.py<br><br>
+        <div style="color:#89b4fa;margin-bottom:4px"># Windows</div>
+        python main.py
+      </div>
+    </div>
+
+    <p style="font-size:.82rem;color:var(--muted);margin-top:16px;line-height:1.8">
+      📄 简报文件生成在程序同目录的 <strong>reports/</strong> 文件夹中。<br>
+      🌱 种子文章管理：<a href="http://127.0.0.1:19523/" target="_blank"
+        style="color:var(--accent)">http://127.0.0.1:19523/</a>（主程序运行后可访问）
     </p>
   </div>
 </div>
@@ -1061,8 +1091,18 @@ def main():
         n = len(_j.load(open("seeds.json")))
         print(f"🌱  种子文章：{n} 篇（seeds.json）")
     print()
-    print("现在可以运行主程序：")
-    print("  python main.py")
+    print("━" * 50)
+    print("  启动主程序的两种方式：")
+    print()
+    print("  方式一（推荐）：")
+    print("    双击 auto-paper-briefing（或 .exe）")
+    print("    文件在与本程序相同的目录中")
+    print()
+    print("  方式二（命令行）：")
+    print("    python main.py")
+    print()
+    print("  简报文件将生成在同目录的 reports/ 文件夹中")
+    print("━" * 50)
     print()
 
 
